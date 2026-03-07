@@ -13,8 +13,11 @@ type HomeScreenNavigationProp = NativeStackNavigationProp<
   "Home"
 >;
 
-export default function Home({ navigation }: { navigation: HomeScreenNavigationProp }) {
- 
+export default function Home({
+  navigation,
+}: {
+  navigation: HomeScreenNavigationProp;
+}) {
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>Pantalla de inicio</Text>
@@ -23,5 +26,5 @@ export default function Home({ navigation }: { navigation: HomeScreenNavigationP
         onPress={() => navigation.navigate("Details")}
       />
     </View>
-  )
+  );
 }
