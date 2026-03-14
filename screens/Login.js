@@ -9,12 +9,16 @@ export default function Login({ navigation }) {
 
   const handleSignIn = () => {
     if (!email || !password) return Alert.alert("Error", "Completa los campos");
+    console.log({email, password});
     signInWithEmailAndPassword(auth, email, password)
       .then((userCredential) => {
         console.log("Usuario logueado:", userCredential.user);
         navigation.replace("Home");
       })
-      .catch((error) => Alert.alert("Error", error.message));
+      .catch((error) => {
+        console.error("Error al iniciar sesión:", error);
+        Alert.alert("Error", error.message)
+      });
   };
 
   return (

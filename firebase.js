@@ -3,22 +3,14 @@ import { getAuth } from "firebase/auth";
 // configuration values are now read from environment variables
 // you'll need to install and configure a dotenv solution
 // e.g. react-native-dotenv (see babel.config.js below)
-import {
-  API_KEY,
-  AUTH_DOMAIN,
-  PROJECT_ID,
-  STORAGE_BUCKET,
-  MESSAGING_SENDER_ID,
-  APP_ID,
-} from "@env";
 
 const firebaseConfig = {
-  apiKey: API_KEY,
-  authDomain: AUTH_DOMAIN,
-  projectId: PROJECT_ID,
-  storageBucket: STORAGE_BUCKET,
-  messagingSenderId: MESSAGING_SENDER_ID,
-  appId: APP_ID,
+  apiKey: "AIzaSyBcYaTYlG6VjJHcwZ3mSSULZ5nYjAUKRlQ",
+  authDomain: "bibloteca-tdea.firebaseapp.com",
+  projectId: "bibloteca-tdea",
+  storageBucket: "bibloteca-tdea.firebasestorage.app",
+  messagingSenderId: "626396455092",
+  appId: "1:626396455092:web:0678c75bce1f4ad823f7e1",
 };
 
 const app = initializeApp(firebaseConfig);
