@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { ScrollView, View, TextInput, Alert } from "react-native";
-import { Heading, Body, PrimaryButton } from "../components/UI";
+import { Heading, Body, PrimaryButton } from "../components";
 import useAuthActions from "../hooks/useAuthActions";
 
 export default function Login({ navigation }) {

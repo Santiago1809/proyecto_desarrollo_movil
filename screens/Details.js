@@ -1,6 +1,6 @@
 import React from "react";
 import { View, ScrollView, Image } from "react-native";
-import { Card, Heading, Body } from "../components/UI";
+import { Card, Heading, Body } from "../components";
 
 export default function Details({ route }) {
   const { book } = route.params || {};

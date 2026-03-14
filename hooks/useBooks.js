@@ -30,7 +30,7 @@ export default function useBooks() {
             image,
             description: data.description || "",
           };
-        })
+        }),
       );
 
       setBooks(items);

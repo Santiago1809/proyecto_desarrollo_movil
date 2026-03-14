@@ -1,4 +1,7 @@
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
 import { auth } from "../firebase";
 
 export default function useAuthActions() {
