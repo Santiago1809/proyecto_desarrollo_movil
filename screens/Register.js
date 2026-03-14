@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 import { ScrollView, View, TextInput, Alert } from "react-native";
 import { Heading, Body, PrimaryButton } from "../components/UI";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import useAuthActions from "../hooks/useAuthActions";
 
 export default function Register({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { signUp } = useAuthActions();
+
   const handleSignUp = () => {
     if (!email || !password) return Alert.alert("Error", "Completa los campos");
-    console.log({ email, password });
-    createUserWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log("Usuario registrado:", userCredential.user);
-        // AuthContext will detect the new user and RootRoutes will switch stacks
-      })
+    signUp(email, password)
+      .then(() => {})
       .catch((error) => Alert.alert("Error", error.message));
   };
 

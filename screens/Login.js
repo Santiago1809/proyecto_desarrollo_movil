@@ -1,21 +1,18 @@
 import React, { useState } from "react";
 import { ScrollView, View, TextInput, Alert } from "react-native";
 import { Heading, Body, PrimaryButton } from "../components/UI";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase";
+import useAuthActions from "../hooks/useAuthActions";
 
 export default function Login({ navigation }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const { signIn } = useAuthActions();
+
   const handleSignIn = () => {
     if (!email || !password) return Alert.alert("Error", "Completa los campos");
-    console.log({ email, password });
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        console.log("Usuario logueado:", userCredential.user);
-        // auth state is handled by AuthContext; RootRoutes will switch stacks
-      })
+    signIn(email, password)
+      .then(() => {})
       .catch((error) => {
         console.error("Error al iniciar sesión:", error);
         Alert.alert("Error", error.message);
