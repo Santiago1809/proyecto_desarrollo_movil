@@ -12,6 +12,7 @@ Este documento define los tickets de trabajo desde el **Segundo Entregable** has
   - [T2-03: Cancelación de Solicitud](#t2-03)
   - [T2-04: Búsqueda de Libros](#t2-04)
   - [T2-05: Filtros por Categoría/Autor](#t2-05)
+  - [T2-06: Campos Adicionales en Registro](#t2-06)
 - [Tercer Entregable](#tercer-entregable)
   - [T3-01: Panel de Gestión de Libros (Admin)](#t3-01)
   - [T3-02: Edición de Libros Existentes](#t3-02)
@@ -173,6 +174,42 @@ Este documento define los tickets de trabajo desde el **Segundo Entregable** has
 - `components/Home/HomeContent.js` (lógica de filtros)
 - `components/HomeHeader.js` (añadir props y UI de filtros)
 - `components/Common/CategoryFilter.js` (nuevo, o integrar en HomeHeader)
+
+---
+
+### T2-06: Campos Adicionales en Registro
+
+**Descripción**
+- Ampliar el formulario de registro para incluir nombre, apellido y fecha de nacimiento o edad.
+- Estos datos deben almacenarse en el documento del usuario en Firestore (colección `users`).
+
+**Criterios de aceptación**
+- La pantalla de registro muestra campos adicionales: Nombre, Apellido, Fecha de nacimiento (o Edad).
+- Todos los campos son obligatorios (excepto si se decide que algunos son opcionales).
+- Al registrarse, se crea el documento del usuario en Firestore con todos los datos, incluyendo el campo `role` por defecto `'user'`.
+- Los datos pueden editarse posteriormente en una pantalla de “Perfil” (opcional para este entregable).
+- Validaciones: nombre/apellido no vacíos, fecha válida, edad > 0 y < 120.
+
+**Notas técnicas**
+- Modificar `components/Auth/RegisterForm.js`:
+  - Añadir estados: `firstName`, `lastName`, `birthDate` (formato ISO string YYYY-MM-DD) o `age` (number). Se recomienda `birthDate` porque es más preciso y permite calcular edad.
+  - Añadir `TextInput` para cada campo con estilos consistentes.
+  - En `handleSignUp`, pasar `{ email, password, firstName, lastName, birthDate }` a `signUp`.
+- Hook `useAuthActions.signUp`:
+  - Actualmente solo registra en Firebase Auth. Debe extenderse para crear documento en `users/{uid}` con todos los campos y `role: 'user'`.
+  - Crear función `createUserDocument(uid, userData)` que guarde en Firestore. Llamarla después de `createUserWithEmailAndPassword`.
+  - Estructura documento: `{ uid, email, firstName, lastName, birthDate, role: 'user', createdAt: serverTimestamp() }`.
+- Modificar `AuthContext` para incluir `firstName`, `lastName`, `birthDate` en el objeto de usuario que provee el contexto, de modo que estén disponibles en toda la app.
+- Validaciones cliente:
+  - Nombre/apellido: al menos 2 caracteres, solo letras y espacios.
+  - Fecha: usar `DatePicker` nativo o simple `TextInput` con máscara YYYY-MM-DD. Validar que sea una fecha válida y que la edad esté en rango (ej. 5-120 años).
+- Sugerencia: crear hook `useUserForm` para reutilizar validaciones entre Login y Register, pero no obligatorio.
+
+**Archivos a crear/modificar**
+- `components/Auth/RegisterForm.js` (añadir campos y validación)
+- `hooks/useAuthActions.js` (crear documento usuario con datos extendidos)
+- `contexts/AuthContext.js` (exponer datos adicionales del usuario)
+- `screens/Profile.js` (opcional: editar perfil, para otro entregable)
 
 ---
 
@@ -375,6 +412,7 @@ Este documento define los tickets de trabajo desde el **Segundo Entregable** has
 - [ ] T2-03: Cancelación de solicitud funcionando
 - [ ] T2-04: Búsqueda de libros implementada
 - [ ] T2-05: Filtros por categoría implementados
+- [ ] T2-06: Campos adicionales en registro (nombre, apellido, fecha nacimiento)
 - [ ] T3-R1: Roles de usuario implementados y cargados en contexto
 - [ ] T3-01: Panel de gestión de libros (admin) con listado y botón agregar
 - [ ] T3-02: Edición de libros funcionando
