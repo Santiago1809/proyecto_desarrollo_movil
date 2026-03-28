@@ -7,17 +7,18 @@ import {
   Modal,
   StyleSheet,
 } from "react-native";
-import { colors } from "../components/colors";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import { colors } from "./colors";
 import { useAuth } from "../contexts/AuthContext";
-import MenuModal from "../components/MenuModal";
+import MenuModal from "./MenuModal";
 
-export default function MainHeader({ navigation, route, options }) {
+export default function HeaderBar({ title }) {
+  const navigation = useNavigation();
+  const route = useRoute();
   const { user } = useAuth();
   const [menuVisible, setMenuVisible] = useState(false);
 
-  const getTitle = () => {
-    return options?.title || route?.name || "";
-  };
+  const displayTitle = title || route.name;
 
   return (
     <>
@@ -30,9 +31,7 @@ export default function MainHeader({ navigation, route, options }) {
             <Text style={styles.backText}>← Volver</Text>
           </TouchableOpacity>
         )}
-
-        <Text style={styles.title}>{getTitle()}</Text>
-
+        <Text style={styles.title}>{displayTitle}</Text>
         {user && (
           <TouchableOpacity
             onPress={() => setMenuVisible(true)}
@@ -42,7 +41,6 @@ export default function MainHeader({ navigation, route, options }) {
           </TouchableOpacity>
         )}
       </View>
-
       <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
     </>
   );
@@ -58,7 +56,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
-    paddingTop: StatusBar.currentHeight || 0,
+    paddingTop: 0,
   },
   backButton: {
     paddingVertical: 8,

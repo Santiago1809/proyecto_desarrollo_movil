@@ -25,23 +25,20 @@ function MainStackNavigator() {
   return (
     <MainStack.Navigator
       screenOptions={{
-        header: (props) => <MainHeader {...props} />,
+        headerShown: false, // Sin header a nivel de stack, cada pantalla renderiza su propio HeaderBar
       }}
     >
       <MainStack.Screen
         name="Home"
         component={require("../screens/Home").default}
-        options={{ title: "Biblioteca" }}
       />
       <MainStack.Screen
         name="AddBook"
         component={require("../screens/AddBook").default}
-        options={{ title: "Agregar libro" }}
       />
       <MainStack.Screen
         name="Details"
         component={require("../screens/Details").default}
-        options={({ route }) => ({ title: route.params?.book?.title ?? "Detalles" })}
       />
       {/* Pantallas adicionales se agregarán aquí */}
     </MainStack.Navigator>

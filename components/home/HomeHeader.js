@@ -14,7 +14,7 @@ export function HomeHeader({ user }) {
     return "Buenas noches";
   };
 
-  const email = user ? user.email : null;
+  
   const userName = email ? email.split("@")[0] : "Usuario";
 
   return (

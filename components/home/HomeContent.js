@@ -13,7 +13,6 @@ import { useAuth } from "../../contexts/AuthContext";
 import { Body, EmptyState } from "../index";
 import BookItem from "../book/BookItem";
 import BookSkeleton from "../book/BookSkeleton";
-import HomeHeader from "./HomeHeader";
 import { colors } from "../colors";
 import useBooks from "../../hooks/useBooks";
 
@@ -76,11 +75,6 @@ export default function HomeContent({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FlatList
-        ListHeaderComponent={() => (
-          <HomeHeader user={user} />
-        )}
-        stickyHeaderIndices={[0]}
-        ListFooterComponent={renderFooter}
         data={books}
         contentContainerStyle={{
           paddingBottom: 24 + insets.bottom,
@@ -92,9 +86,7 @@ export default function HomeContent({ navigation }) {
         columnWrapperStyle={columnWrapper}
         contentInsetAdjustmentBehavior="automatic"
         ListEmptyComponent={renderEmptyState}
-        ListHeaderComponentStyle={{
-          marginBottom: 8,
-        }}
+        ListFooterComponent={renderFooter}
         refreshControl={
           <RefreshControl
             refreshing={loading}
