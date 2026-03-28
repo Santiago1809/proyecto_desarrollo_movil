@@ -27,7 +27,6 @@ export function BookItem({ item, itemSize, navigation }) {
       style={{
         width: itemSize,
         marginBottom: 16,
-        alignSelf: "center",
         transform: [{ scale: animatedValue }],
       }}
     >

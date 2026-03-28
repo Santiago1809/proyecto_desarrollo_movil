@@ -13,6 +13,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { Body, EmptyState } from "../index";
 import BookItem from "../book/BookItem";
 import BookSkeleton from "../book/BookSkeleton";
+import HomeHeader from "./HomeHeader";
+import MenuModal from "../MenuModal";
 import { colors } from "../colors";
 import useBooks from "../../hooks/useBooks";
 
@@ -20,6 +22,7 @@ export default function HomeContent({ navigation }) {
   const { books, loading, refresh } = useBooks();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
+  const [menuVisible, setMenuVisible] = useState(false);
 
   const { width } = useWindowDimensions();
   const numColumns = width >= 900 ? 3 : width >= 600 ? 2 : 1;
@@ -75,23 +78,25 @@ export default function HomeContent({ navigation }) {
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FlatList
+        ListHeaderComponent={() => (
+          <HomeHeader user={user} onOpenMenu={() => setMenuVisible(true)} />
+        )}
+        stickyHeaderIndices={[0]}
+        ListFooterComponent={renderFooter}
         data={books}
         contentContainerStyle={{
-          paddingHorizontal: 16,
           paddingBottom: 24 + insets.bottom,
           paddingTop: 8,
         }}
         keyExtractor={(item) => item.id}
         renderItem={renderBookItem}
         numColumns={numColumns}
-        columnWrapperStyle={
-          numColumns > 1
-            ? { justifyContent: "space-between" }
-            : undefined
-        }
+        columnWrapperStyle={columnWrapper}
         contentInsetAdjustmentBehavior="automatic"
         ListEmptyComponent={renderEmptyState}
-        ListFooterComponent={renderFooter}
+        ListHeaderComponentStyle={{
+          marginBottom: 8,
+        }}
         refreshControl={
           <RefreshControl
             refreshing={loading}
@@ -102,7 +107,9 @@ export default function HomeContent({ navigation }) {
         }
       />
 
-      {!loading && user?.role === "admin" && (
+      <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
+
+      {!loading && (
         <TouchableOpacity
           onPress={() => navigation.navigate("AddBook")}
           style={[styles.fab, { bottom: 28 + insets.bottom }]}

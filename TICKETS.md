@@ -412,7 +412,7 @@ Este documento define los tickets de trabajo desde el **Segundo Entregable** has
 - [ ] T2-03: Cancelación de solicitud funcionando
 - [ ] T2-04: Búsqueda de libros implementada
 - [ ] T2-05: Filtros por categoría implementados
-- [x] T2-06: Campos adicionales en registro (nombre, apellido, fecha nacimiento)
+- [ ] T2-06: Campos adicionales en registro (nombre, apellido, fecha nacimiento)
 - [ ] T3-R1: Roles de usuario implementados y cargados en contexto
 - [ ] T3-01: Panel de gestión de libros (admin) con listado y botón agregar
 - [ ] T3-02: Edición de libros funcionando
