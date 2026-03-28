@@ -9,17 +9,11 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuth } from "../../contexts/AuthContext";
-import {
-  Body,
-  EmptyState,
-  BookSkeleton,
-  BookItem,
-  HomeHeader,
-} from "../index";
-import MenuModal from "../MenuModal";
-import { colors } from "../colors";
-import useBooks from "../../hooks/useBooks";
+import { useAuth } from "../contexts/AuthContext";
+import { Body, EmptyState, BookSkeleton, BookItem, HomeHeader } from "./index";
+import MenuModal from "./MenuModal";
+import { colors } from "./colors";
+import useBooks from "../hooks/useBooks";
 
 export default function HomeContent({ navigation }) {
   const { books, loading, refresh } = useBooks();
@@ -30,7 +24,7 @@ export default function HomeContent({ navigation }) {
   const { width } = useWindowDimensions();
   const numColumns = width >= 900 ? 3 : width >= 600 ? 2 : 1;
   const itemSize = Math.floor(
-    (width - 32 - (numColumns - 1) * 12) / numColumns
+    (width - 32 - (numColumns - 1) * 12) / numColumns,
   );
   const columnWrapper =
     numColumns > 1 ? { justifyContent: "space-between" } : undefined;
@@ -39,12 +33,12 @@ export default function HomeContent({ navigation }) {
     ({ item }) => (
       <BookItem item={item} itemSize={itemSize} navigation={navigation} />
     ),
-    [itemSize, navigation]
+    [itemSize, navigation],
   );
 
   const renderSkeleton = useCallback(
     () => <BookSkeleton size={itemSize} />,
-    [itemSize]
+    [itemSize],
   );
 
   const renderFooter = useCallback(() => {

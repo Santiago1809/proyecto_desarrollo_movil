@@ -1,23 +1,35 @@
 import React, { useState } from "react";
 import { ScrollView, View, TextInput, Alert } from "react-native";
-import { Heading, Body, PrimaryButton } from "../";
-import useAuthActions from "../../hooks/useAuthActions";
+import NetInfo from "@react-native-community/netinfo";
+import { Heading, Body, PrimaryButton } from ".";
+import useAuthActions from "../hooks/useAuthActions";
 
-export default function RegisterForm({ onSuccess, onSwitchToLogin }) {
+export default function LoginForm({ onSuccess, onSwitchToRegister }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const { signUp } = useAuthActions();
+  const { signIn } = useAuthActions();
 
-  const handleSignUp = async () => {
-    if (!email || !password) {
-      return Alert.alert("Error", "Completa los campos");
-    }
+  const handleSignIn = async () => {
+    if (!email || !password) return Alert.alert("Error", "Completa los campos");
+
     try {
-      await signUp(email, password);
+      const state = await NetInfo.fetch();
+      if (!state.isConnected) {
+        return Alert.alert(
+          "Sin conexión",
+          "Revisa tu Internet e intenta de nuevo.",
+        );
+      }
+
+      await signIn(email, password);
       if (onSuccess) onSuccess();
     } catch (error) {
-      Alert.alert("Error", error.message || "Error al registrarse");
+      console.error("Error al iniciar sesión:", error);
+      Alert.alert(
+        "Error",
+        error.message || "Ocurrió un problema al iniciar sesión",
+      );
     }
   };
 
@@ -60,11 +72,14 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }) {
         }}
       />
 
-      <PrimaryButton title="Registrarse" onPress={handleSignUp} />
+      <PrimaryButton title="Iniciar sesión" onPress={handleSignIn} />
 
       <View style={{ marginTop: 12 }}>
-        <Body style={{ textAlign: "center" }} onPress={onSwitchToLogin}>
-          ¿Ya tienes cuenta? Iniciar sesión
+        <Body
+          style={{ textAlign: "center", marginTop: 12 }}
+          onPress={onSwitchToRegister}
+        >
+          Crear cuenta
         </Body>
       </View>
     </ScrollView>
