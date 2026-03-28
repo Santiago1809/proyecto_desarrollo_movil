@@ -6,11 +6,18 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
 } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { colors } from "./colors";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function MenuModal({ visible, onClose }) {
+  const navigation = useNavigation();
   const { signOut, user } = useAuth();
+
+  const handleNavigate = (route) => {
+    navigation.navigate(route);
+    onClose();
+  };
 
   return (
     <Modal
@@ -53,6 +60,39 @@ export default function MenuModal({ visible, onClose }) {
               <Text style={{ color: colors.textMuted, marginBottom: 12 }}>
                 {user?.email}
               </Text>
+
+              {user?.role === "admin" && (
+                <>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: "600",
+                      color: colors.textMuted,
+                      marginTop: 8,
+                      marginBottom: 8,
+                    }}
+                  >
+                    Administración
+                  </Text>
+                  <TouchableOpacity
+                    onPress={() => handleNavigate("AdminBooks")}
+                    style={{ paddingVertical: 12 }}
+                  >
+                    <Text style={{ color: colors.primary, fontWeight: "600", fontSize: 15 }}>
+                      Gestión de Libros
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => handleNavigate("AdminLoans")}
+                    style={{ paddingVertical: 12 }}
+                  >
+                    <Text style={{ color: colors.primary, fontWeight: "600", fontSize: 15 }}>
+                      Gestión de Préstamos
+                    </Text>
+                  </TouchableOpacity>
+                  <View style={{ height: 8 }} />
+                </>
+              )}
 
               <TouchableOpacity
                 onPress={() => {

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Heading, Body } from "../index";
 import { colors } from "../colors";
 
-export function HomeHeader({ user, onOpenMenu }) {
+export function HomeHeader({ user }) {
   const insets = useSafeAreaInsets();
 
   const getGreeting = () => {
@@ -28,42 +28,20 @@ export function HomeHeader({ user, onOpenMenu }) {
         },
       ]}
     >
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: 8,
-        }}
-      >
-        <View style={{ flex: 1 }}>
-          <Heading style={{ fontSize: 16, color: colors.textMuted }}>
-            {getGreeting()},
-          </Heading>
-          <Heading
-            style={{
-              fontSize: 26,
-              fontWeight: "700",
-              color: colors.text,
-              lineHeight: 32,
-            }}
-          >
-            {userName}
-          </Heading>
-        </View>
-        <TouchableOpacity
-          onPress={onOpenMenu}
+      <View style={{ marginBottom: 8 }}>
+        <Heading style={{ fontSize: 16, color: colors.textMuted }}>
+          {getGreeting()},
+        </Heading>
+        <Heading
           style={{
-            width: 40,
-            height: 40,
-            borderRadius: 8,
-            backgroundColor: colors.surface,
-            alignItems: "center",
-            justifyContent: "center",
+            fontSize: 26,
+            fontWeight: "700",
+            color: colors.text,
+            lineHeight: 32,
           }}
         >
-          <Text style={{ color: colors.text, fontSize: 20 }}>☰</Text>
-        </TouchableOpacity>
+          {userName}
+        </Heading>
       </View>
       <Body style={{ fontSize: 13, color: colors.textMuted, marginBottom: 16 }}>
         {new Date().toLocaleDateString("es-ES", {
@@ -72,7 +50,6 @@ export function HomeHeader({ user, onOpenMenu }) {
           month: "long",
         })}
       </Body>
-      {/* Drawer menu contains the Cerrar sesión action */}
     </View>
   );
 }

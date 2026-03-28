@@ -14,7 +14,6 @@ import { Body, EmptyState } from "../index";
 import BookItem from "../book/BookItem";
 import BookSkeleton from "../book/BookSkeleton";
 import HomeHeader from "./HomeHeader";
-import MenuModal from "../MenuModal";
 import { colors } from "../colors";
 import useBooks from "../../hooks/useBooks";
 
@@ -22,7 +21,6 @@ export default function HomeContent({ navigation }) {
   const { books, loading, refresh } = useBooks();
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const [menuVisible, setMenuVisible] = useState(false);
 
   const { width } = useWindowDimensions();
   const numColumns = width >= 900 ? 3 : width >= 600 ? 2 : 1;
@@ -79,7 +77,7 @@ export default function HomeContent({ navigation }) {
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <FlatList
         ListHeaderComponent={() => (
-          <HomeHeader user={user} onOpenMenu={() => setMenuVisible(true)} />
+          <HomeHeader user={user} />
         )}
         stickyHeaderIndices={[0]}
         ListFooterComponent={renderFooter}
@@ -106,8 +104,6 @@ export default function HomeContent({ navigation }) {
           />
         }
       />
-
-      <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
 
       {!loading && (
         <TouchableOpacity
