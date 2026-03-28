@@ -2,7 +2,7 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../contexts/AuthContext";
-import GlobalHeader from "./GlobalHeader";
+import MainHeader from "./MainHeader";
 
 const AuthStack = createNativeStackNavigator();
 
@@ -25,7 +25,7 @@ function MainStackNavigator() {
   return (
     <MainStack.Navigator
       screenOptions={{
-        header: (props) => <GlobalHeader {...props} />,
+        header: (props) => <MainHeader {...props} />,
       }}
     >
       <MainStack.Screen

@@ -7,30 +7,16 @@ import {
   Modal,
   StyleSheet,
 } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
 import { colors } from "../components/colors";
 import { useAuth } from "../contexts/AuthContext";
 import MenuModal from "../components/MenuModal";
 
-export default function GlobalHeader() {
-  const navigation = useNavigation();
-  const route = useRoute();
+export default function MainHeader({ navigation, route, options }) {
   const { user } = useAuth();
   const [menuVisible, setMenuVisible] = useState(false);
 
   const getTitle = () => {
-    // Usar el título definido en la pantalla si existe
-    const routeName = route.name;
-    const titles = {
-      Home: "Biblioteca",
-      AddBook: "Agregar libro",
-      Details: "Detalles",
-      MyLoans: "Mis préstamos",
-      AdminBooks: "Gestión de libros",
-      EditBook: "Editar libro",
-      AdminLoans: "Gestión de préstamos",
-    };
-    return titles[routeName] || routeName;
+    return options?.title || route?.name || "";
   };
 
   return (

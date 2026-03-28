@@ -105,7 +105,7 @@ export default function HomeContent({ navigation }) {
         }
       />
 
-      {!loading && (
+      {!loading && user?.role === "admin" && (
         <TouchableOpacity
           onPress={() => navigation.navigate("AddBook")}
           style={[styles.fab, { bottom: 28 + insets.bottom }]}
