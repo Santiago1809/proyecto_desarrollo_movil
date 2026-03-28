@@ -15,7 +15,7 @@ export function HomeHeader({ user }) {
   };
 
   
-  const userName = email ? email.split("@")[0] : "Usuario";
+  const userName = user?.name ||   "Usuario";
 
   return (
     <View

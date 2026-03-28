@@ -77,13 +77,18 @@ export default function HomeContent({ navigation }) {
       <FlatList
         data={books}
         contentContainerStyle={{
+          paddingHorizontal: 16,
           paddingBottom: 24 + insets.bottom,
           paddingTop: 8,
         }}
         keyExtractor={(item) => item.id}
         renderItem={renderBookItem}
         numColumns={numColumns}
-        columnWrapperStyle={columnWrapper}
+        columnWrapperStyle={
+          numColumns > 1
+            ? { justifyContent: "space-between" }
+            : undefined
+        }
         contentInsetAdjustmentBehavior="automatic"
         ListEmptyComponent={renderEmptyState}
         ListFooterComponent={renderFooter}
