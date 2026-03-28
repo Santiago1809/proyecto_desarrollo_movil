@@ -1,8 +1,8 @@
 import React from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Heading, Body } from ".";
-import { colors } from "./colors";
+import { Heading, Body } from "../index";
+import { colors } from "../colors";
 
 export function HomeHeader({ user, onOpenMenu }) {
   const insets = useSafeAreaInsets();

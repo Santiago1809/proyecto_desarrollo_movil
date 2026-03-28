@@ -1,8 +1,8 @@
 import React from "react";
 import { View, ScrollView, Image } from "react-native";
-import { Card, Heading, Body } from "./index";
-import LoanButton from "./LoanButton";
-import { colors } from "./colors";
+import { Card, Heading, Body } from "../index";
+import LoanButton from "../LoanButton";
+import { colors } from "../colors";
 
 export default function BookDetails({ book }) {
   if (!book) {

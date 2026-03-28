@@ -1,7 +1,7 @@
 import React from "react";
 import { SafeAreaView, View, TouchableOpacity, Text } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import BookForm from "../components/book-form";
+import BookForm from "../components/book/book-form";
 import Heading from "../components/Heading";
 import Body from "../components/Body";
 import { colors } from "../components/colors";

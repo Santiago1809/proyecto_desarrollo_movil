@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { ScrollView, View, TextInput, Alert } from "react-native";
 import NetInfo from "@react-native-community/netinfo";
-import { Heading, Body, PrimaryButton } from ".";
-import useAuthActions from "../hooks/useAuthActions";
+import { Heading, Body, PrimaryButton } from "..";
+import useAuthActions from "../../hooks/useAuthActions";
 
 export default function LoginForm({ onSuccess, onSwitchToRegister }) {
   const [email, setEmail] = useState("");

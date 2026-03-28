@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Animated, TouchableOpacity, Image, View, Text } from "react-native";
-import { Card, Heading, Body } from ".";
-import { colors } from "./colors";
+import { Card, Heading, Body } from "../index";
+import { colors } from "../colors";
 
 export function BookItem({ item, itemSize, navigation }) {
   const [animatedValue] = useState(new Animated.Value(1));

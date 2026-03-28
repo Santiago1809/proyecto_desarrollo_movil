@@ -9,11 +9,14 @@ import {
   ActivityIndicator,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useAuth } from "../contexts/AuthContext";
-import { Body, EmptyState, BookSkeleton, BookItem, HomeHeader } from "./index";
-import MenuModal from "./MenuModal";
-import { colors } from "./colors";
-import useBooks from "../hooks/useBooks";
+import { useAuth } from "../../contexts/AuthContext";
+import { Body, EmptyState } from "../index";
+import BookItem from "../book/BookItem";
+import BookSkeleton from "../book/BookSkeleton";
+import HomeHeader from "./HomeHeader";
+import MenuModal from "../MenuModal";
+import { colors } from "../colors";
+import useBooks from "../../hooks/useBooks";
 
 export default function HomeContent({ navigation }) {
   const { books, loading, refresh } = useBooks();

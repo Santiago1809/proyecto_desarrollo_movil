@@ -1,10 +1,10 @@
 import React from "react";
-import LoginForm from "../components/LoginForm";
+import LoginForm from "../components/auth/LoginForm";
 
 export default function Login({ navigation }) {
   return (
     <LoginForm
-      onSuccess={() => navigation.goBack()}
+      onSuccess={() => {}}
       onSwitchToRegister={() => navigation.navigate("Register")}
     />
   );
