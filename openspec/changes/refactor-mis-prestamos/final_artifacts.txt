@@ -1,0 +1,8 @@
+Hybrid-mode final artifacts (if applicable):
+- components/loans/ActiveLoansList.js
+- components/loans/LoanHistoryList.js
+- screens/MisPrestamos.js
+- openspec/changes/refactor-mis-prestamos/README.md
+
+Notes:
+- This file serves as a placeholder for final artifacts in hybrid mode. The actual delta/spec artifacts can be added here as they are finalized.
