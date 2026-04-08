@@ -1,9 +1,13 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   doc,
   collection,
+  query,
+  where,
+  getDocs,
   runTransaction,
   serverTimestamp,
+  onSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -16,6 +20,8 @@ const STATES = {
 
 export default function useLoans() {
   const [loading, setLoading] = useState(false);
+  const [userLoans, setUserLoans] = useState([]);
+  const [userLoansLoading, setUserLoansLoading] = useState(true);
 
   const requestLoan = useCallback(async (bookId, borrowerId) => {
     if (!bookId || !borrowerId) throw new Error("bookId and borrowerId required");
@@ -120,5 +126,52 @@ export default function useLoans() {
   const markDelivered = useCallback((loanId) => updateLoanStatus(loanId, STATES.DELIVERED), [updateLoanStatus]);
   const markReturned = useCallback((loanId) => updateLoanStatus(loanId, STATES.RETURNED), [updateLoanStatus]);
 
-  return { requestLoan, updateLoanStatus, approveLoan, markDelivered, markReturned, loading, STATES };
+  // Get loans for a specific user (real-time subscription)
+  const subscribeToUserLoans = useCallback((userId) => {
+    if (!userId) return () => {};
+    
+    setUserLoansLoading(true);
+    const q = query(collection(db, "loans"), where("borrowerId", "==", userId));
+    
+    const unsub = onSnapshot(
+      q,
+      (snap) => {
+        const items = snap.docs.map((d) => {
+          const data = d.data();
+          return {
+            id: d.id,
+            bookId: data.bookId || null,
+            borrowerId: data.borrowerId || null,
+            status: data.status || "solicitado",
+            requestedAt: data.requestedAt?.toDate ? data.requestedAt.toDate() : null,
+            approvedAt: data.approvedAt?.toDate ? data.approvedAt.toDate() : null,
+            deliveredAt: data.deliveredAt?.toDate ? data.deliveredAt.toDate() : null,
+            returnedAt: data.returnedAt?.toDate ? data.returnedAt.toDate() : null,
+          };
+        });
+        setUserLoans(items);
+        setUserLoansLoading(false);
+      },
+      (err) => {
+        console.error("subscribeToUserLoans error:", err);
+        setUserLoans([]);
+        setUserLoansLoading(false);
+      }
+    );
+    
+    return unsub;
+  }, []);
+
+  return { 
+    requestLoan, 
+    updateLoanStatus, 
+    approveLoan, 
+    markDelivered, 
+    markReturned, 
+    loading, 
+    STATES,
+    userLoans,
+    userLoansLoading,
+    subscribeToUserLoans
+  };
 }

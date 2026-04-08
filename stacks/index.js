@@ -1,12 +1,9 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useAuth } from "../contexts/AuthContext";
-import MainHeader from "./MainHeader";
 
 const AuthStack = createNativeStackNavigator();
 
-function AuthStackNavigator() {
+export function AuthStackNavigator() {
   return (
     <AuthStack.Navigator
       screenOptions={{
@@ -21,7 +18,7 @@ function AuthStackNavigator() {
 
 const MainStack = createNativeStackNavigator();
 
-function MainStackNavigator() {
+export function MainStackNavigator() {
   return (
     <MainStack.Navigator
       screenOptions={{
@@ -40,12 +37,16 @@ function MainStackNavigator() {
         name="Details"
         component={require("../screens/Details").default}
       />
+      <MainStack.Screen
+        name="MisPrestamos"
+        component={require("../screens/MisPrestamos").default}
+      />
       {/* Pantallas adicionales se agregarán aquí */}
     </MainStack.Navigator>
   );
 }
 
-export default function RootNavigator() {
+export function RootNavigator() {
   const { user, loading } = useAuth();
 
   if (loading) return null;

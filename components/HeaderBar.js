@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Ionicons } from "@expo/vector-icons";
 import { colors } from "./colors";
 import { useAuth } from "../contexts/AuthContext";
 import MenuModal from "./MenuModal";
 
-export default function HeaderBar({ title }) {
+export default function HeaderBar({ title, showBackButton = true }) {
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = useAuth();
@@ -21,6 +22,7 @@ export default function HeaderBar({ title }) {
   const insets = useSafeAreaInsets();
 
   const displayTitle = title || route.name;
+  const canGoBack = navigation.canGoBack() && showBackButton;
 
   const headerStyle = {
     backgroundColor: colors.surface,
@@ -38,7 +40,7 @@ export default function HeaderBar({ title }) {
   return (
     <>
       <View style={headerStyle}>
-        {navigation.canGoBack() && (
+        {canGoBack && (
           <TouchableOpacity
             onPress={() => navigation.goBack()}
             style={styles.backButton}
@@ -52,7 +54,7 @@ export default function HeaderBar({ title }) {
             onPress={() => setMenuVisible(true)}
             style={styles.menuButton}
           >
-            <Text style={styles.menuIcon}>☰</Text>
+            <Ionicons name="menu" size={24} color={colors.text} />
           </TouchableOpacity>
         )}
       </View>

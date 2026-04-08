@@ -71,6 +71,13 @@ export default function MenuModal({ visible, onClose }) {
             <Text style={styles.title}>Cuenta</Text>
             <Text style={styles.email}>{user?.email}</Text>
 
+            <TouchableOpacity
+              onPress={() => handleNavigate("MisPrestamos")}
+              style={styles.item}
+            >
+              <Text style={styles.itemText}>Mis Préstamos</Text>
+            </TouchableOpacity>
+
             {user?.role === "admin" && (
               <>
                 <Text style={styles.sectionTitle}>Administración</Text>
