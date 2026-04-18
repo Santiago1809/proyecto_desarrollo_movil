@@ -11,11 +11,12 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 
-const STATES = {
+export const STATES = {
   REQUESTED: "solicitado",
   APPROVED: "aprobado",
   DELIVERED: "entregado",
   RETURNED: "devuelto",
+  CANCELLED: "cancelado",
 };
 
 export default function useLoans() {
@@ -126,6 +127,59 @@ export default function useLoans() {
   const markDelivered = useCallback((loanId) => updateLoanStatus(loanId, STATES.DELIVERED), [updateLoanStatus]);
   const markReturned = useCallback((loanId) => updateLoanStatus(loanId, STATES.RETURNED), [updateLoanStatus]);
 
+  // Cancel a loan request (only when REQUESTED or APPROVED)
+  const cancelLoan = useCallback(async (loanId) => {
+    if (!loanId) throw new Error("loanId required");
+    setLoading(true);
+    try {
+      const loanRef = doc(db, "loans", loanId);
+
+      await runTransaction(db, async (transaction) => {
+        const loanSnap = await transaction.get(loanRef);
+        if (!loanSnap.exists()) throw new Error("Préstamo no encontrado");
+        const loan = loanSnap.data();
+        const current = loan.status;
+
+        // Validate: cannot cancel if already DELIVERED or RETURNED
+        if (current === STATES.DELIVERED || current === STATES.RETURNED) {
+          throw new Error("No se puede cancelar un préstamo que ya ha sido entregado");
+        }
+
+        // Validate: cannot cancel if already CANCELLED
+        if (current === STATES.CANCELLED) {
+          throw new Error("Esta solicitud ya ha sido cancelada");
+        }
+
+        // Only allow cancellation from REQUESTED or APPROVED states
+        if (current !== STATES.REQUESTED && current !== STATES.APPROVED) {
+          throw new Error(`No se puede cancelar un préstamo en estado: ${current}`);
+        }
+
+        const bookRef = doc(db, "books", loan.bookId);
+        const bookSnap = await transaction.get(bookRef);
+        if (!bookSnap.exists()) throw new Error("Libro del préstamo no encontrado");
+
+        // Make book available again
+        transaction.update(bookRef, {
+          available: true,
+          updatedAt: serverTimestamp(),
+        });
+
+        // Update loan to cancelled status
+        transaction.update(loanRef, {
+          status: STATES.CANCELLED,
+          cancelledAt: serverTimestamp(),
+        });
+      });
+
+      return { success: true };
+    } catch (err) {
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   // Get loans for a specific user (real-time subscription)
   const subscribeToUserLoans = useCallback((userId) => {
     if (!userId) return () => {};
@@ -147,6 +201,7 @@ export default function useLoans() {
             approvedAt: data.approvedAt?.toDate ? data.approvedAt.toDate() : null,
             deliveredAt: data.deliveredAt?.toDate ? data.deliveredAt.toDate() : null,
             returnedAt: data.returnedAt?.toDate ? data.returnedAt.toDate() : null,
+            cancelledAt: data.cancelledAt?.toDate ? data.cancelledAt.toDate() : null,
           };
         });
         setUserLoans(items);
@@ -168,6 +223,7 @@ export default function useLoans() {
     approveLoan, 
     markDelivered, 
     markReturned, 
+    cancelLoan,
     loading, 
     STATES,
     userLoans,

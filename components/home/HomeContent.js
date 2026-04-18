@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ import { Body, EmptyState } from "../index";
 import BookItem from "../book/BookItem";
 import BookSkeleton from "../book/BookSkeleton";
 import { colors } from "../colors";
+import HomeFilters from "./HomeFilters";
+import { PRESET_CATEGORIES, deriveCategoriesFromBooks } from "../../hooks/useBooks";
 import useBooks from "../../hooks/useBooks";
 
 export default function HomeContent({ navigation }) {
@@ -22,8 +24,46 @@ export default function HomeContent({ navigation }) {
   const { user } = useAuth();
   const insets = useSafeAreaInsets();
 
+  // Filters state and data
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("Todas");
+  const categories = useMemo(() => {
+    // derive categories from books, but also include preset categories
+    const derived = deriveCategoriesFromBooks(books);
+    const unique = Array.from(new Set(derived.filter((c) => !!c)));
+    return ['Todas', ...Array.from(new Set([ ...unique, ...PRESET_CATEGORIES ].filter(Boolean)))];
+  }, [books]);
+
+  const matchesQuery = useCallback((b) => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    const hay = [b.title, b.author, Array.isArray(b.categories) ? b.categories.join(' ') : (b.category ? b.category : ''), b.description]
+      .filter(Boolean)
+      .join(" ")
+      .toLowerCase();
+    return hay.includes(q);
+  }, [searchQuery]);
+  const filteredBooks = books.filter((b) => {
+    const hasCategory = selectedCategory === 'Todas' || (Array.isArray(b.categories) ? b.categories.includes(selectedCategory) : (b.category === selectedCategory));
+    return hasCategory && matchesQuery(b);
+  });
+
   // Fixed width for horizontal card
   const cardWidth = useWindowDimensions().width - 32;
+
+  // Stable header element to prevent remount of the search TextInput
+  const headerElement = useMemo(
+    () => (
+      <HomeFilters
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        categories={categories}
+        selectedCategory={selectedCategory}
+        onCategorySelect={setSelectedCategory}
+      />
+    ),
+    [searchQuery, categories, selectedCategory]
+  );
 
   const renderBookItem = useCallback(
     ({ item }) => (
@@ -85,7 +125,7 @@ export default function HomeContent({ navigation }) {
 
       {/* Book List - Vertical */}
       <FlatList
-        data={books}
+        data={filteredBooks}
         contentContainerStyle={{
           paddingHorizontal: 16,
           paddingBottom: 100 + insets.bottom,
@@ -106,6 +146,7 @@ export default function HomeContent({ navigation }) {
           />
         }
         showsVerticalScrollIndicator={false}
+        ListHeaderComponent={headerElement}
       />
 
       {/* FAB for Admin */}

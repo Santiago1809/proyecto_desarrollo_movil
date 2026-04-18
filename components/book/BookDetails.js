@@ -1,12 +1,46 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, ScrollView, Image, Text, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import LoanButton from "../LoanButton";
 import { colors } from "../colors";
+import useLoans from "../../hooks/useLoans";
+import { useAuth } from "../../contexts/AuthContext";
+
+// Loan states
+const STATES = {
+  REQUESTED: "solicitado",
+  APPROVED: "aprobado",
+  DELIVERED: "entregado",
+  RETURNED: "devuelto",
+  CANCELLED: "cancelado",
+};
 
 export default function BookDetails({ book }) {
   const insets = useSafeAreaInsets();
+  const { user } = useAuth() || {};
+  const { userLoans, subscribeToUserLoans } = useLoans();
+  const [activeLoan, setActiveLoan] = useState(null);
+
+  // Subscribe to user loans to get loan status for this book
+  useEffect(() => {
+    if (!user?.uid || !book?.id) return;
+    const unsub = subscribeToUserLoans(user.uid);
+    return () => unsub && unsub();
+  }, [user?.uid, book?.id]);
+
+  // Find active loan for this book
+  useEffect(() => {
+    if (!userLoans || !book?.id) {
+      setActiveLoan(null);
+      return;
+    }
+    const loan = userLoans.find(
+      (l) => l.bookId === book.id &&
+      (l.status === STATES.REQUESTED || l.status === STATES.APPROVED || l.status === STATES.DELIVERED)
+    );
+    setActiveLoan(loan || null);
+  }, [userLoans, book?.id]);
 
   if (!book) {
     return (
@@ -46,19 +80,19 @@ export default function BookDetails({ book }) {
         {/* Gradient Overlay */}
         <View style={styles.imageOverlay} />
         
-        {/* Availability Badge - Premium */}
+        {/* Loan Status Badge */}
         <View style={[
           styles.availabilityBadge,
-          { backgroundColor: book.available ? colors.success : colors.error }
+          activeLoan ? getStatusBadgeColor(activeLoan.status) : (book.available ? colors.success : colors.error)
         ]}>
           <View style={styles.badgeContent}>
             <Ionicons 
-              name={book.available ? "checkmark-circle" : "close-circle"} 
+              name={activeLoan ? getStatusIcon(activeLoan.status) : (book.available ? "checkmark-circle" : "close-circle")} 
               size={16} 
               color={colors.surface} 
             />
             <Text style={styles.availabilityText}>
-              {book.available ? "Disponible" : "No disponible"}
+              {activeLoan ? getStatusText(activeLoan.status) : (book.available ? "Disponible" : "No disponible")}
             </Text>
           </View>
         </View>
@@ -277,3 +311,37 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
 });
+
+// Helper functions for loan status display
+const getStatusBadgeColor = (status) => {
+  switch (status) {
+    case STATES.REQUESTED: return colors.warning;
+    case STATES.APPROVED: return colors.primary;
+    case STATES.DELIVERED: return colors.success;
+    case STATES.RETURNED: return colors.textMuted;
+    case STATES.CANCELLED: return colors.error;
+    default: return colors.success;
+  }
+};
+
+const getStatusIcon = (status) => {
+  switch (status) {
+    case STATES.REQUESTED: return "time-outline";
+    case STATES.APPROVED: return "checkmark-circle";
+    case STATES.DELIVERED: return "arrow-forward-circle";
+    case STATES.RETURNED: return "checkmark-done-circle";
+    case STATES.CANCELLED: return "close-circle";
+    default: return "checkmark-circle";
+  }
+};
+
+const getStatusText = (status) => {
+  switch (status) {
+    case STATES.REQUESTED: return "Solicitado";
+    case STATES.APPROVED: return "Aprobado";
+    case STATES.DELIVERED: return "Entregado";
+    case STATES.RETURNED: return "Devuelto";
+    case STATES.CANCELLED: return "Cancelado";
+    default: return "Disponible";
+  }
+};

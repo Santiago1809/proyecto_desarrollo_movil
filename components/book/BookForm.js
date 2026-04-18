@@ -16,6 +16,11 @@ import { Ionicons } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
 import * as FileSystem from "expo-file-system/legacy";
 import { colors } from "../colors";
+import { CATEGORY_COLORS } from "../../constants/categoryColors";
+import { PRESET_CATEGORIES } from "../../constants/presetCategories";
+import { Modal } from "react-native";
+
+// Styles for new category multi-select UI (dynamic values depend on color map)
 
 export default function BookForm({ onAdd }) {
   const insets = useSafeAreaInsets();
@@ -23,6 +28,9 @@ export default function BookForm({ onAdd }) {
   const [author, setAuthor] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  // New: categories multi-select
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
   const [available, setAvailable] = useState(true);
   const [image, setImage] = useState(null);
   const [submitting, setSubmitting] = useState(false);
@@ -48,16 +56,28 @@ export default function BookForm({ onAdd }) {
       Alert.alert("Faltan campos", "Completa el título y el autor.");
       return;
     }
+    if (!image) {
+      Alert.alert("Imagen requerida", "Por favor añade una imagen de portada para el libro.");
+      return;
+    }
     setSubmitting(true);
     try {
       await onAdd(
-        { title, author, description, category, available },
+        {
+          title,
+          author,
+          description,
+          categories: selectedCategories,
+          category: selectedCategories[0] || "",
+          available,
+        },
         image ? image.base64 : null,
       );
       setTitle("");
       setAuthor("");
       setDescription("");
       setCategory("");
+      setSelectedCategories([]);
       setAvailable(true);
       setImage(null);
       Alert.alert("Éxito", "Libro agregado correctamente.");
@@ -124,20 +144,55 @@ export default function BookForm({ onAdd }) {
           />
         </View>
 
-        {/* Category */}
+        {/* Categories (multi-select) */}
         <View style={styles.inputGroup}>
           <View style={styles.labelRow}>
             <Ionicons name="pricetag" size={16} color={colors.primary} />
-            <Text style={styles.label}>Categoría</Text>
+            <Text style={styles.label}>Categorías</Text>
           </View>
-          <TextInput
-            placeholder="Ej: Ficción, Ciencia, Novela"
-            value={category}
-            onChangeText={setCategory}
-            style={styles.input}
-            placeholderTextColor={colors.textMuted}
-          />
+            <TouchableOpacity onPress={() => setModalVisible(true)} style={styles.multiSelectBtn}>
+              <Text style={styles.multiSelectBtnText}>Seleccionar categorías</Text>
+            </TouchableOpacity>
+              {selectedCategories.length > 0 && (
+                <View style={styles.selectedContainer}>
+                  {selectedCategories.map((c) => (
+                    <View key={c} style={[styles.selectedChip, { backgroundColor: CATEGORY_COLORS[c] || '#ccc' }]}> 
+                      <Text style={styles.selectedChipText}>{c}</Text>
+                    </View>
+                  ))}
+                </View>
+              )}
         </View>
+        <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={() => setModalVisible(false)}>
+          <View style={styles.modalBackdrop}>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Selecciona categorías</Text>
+              <ScrollView contentContainerStyle={styles.modalScroll}>
+                {PRESET_CATEGORIES.map((cat) => {
+                  const active = selectedCategories.includes(cat);
+                  const color = CATEGORY_COLORS[cat] || '#888';
+                  return (
+                    <TouchableOpacity key={cat} onPress={() => {
+                      setSelectedCategories((prev) =>
+                        prev.includes(cat) ? prev.filter((p) => p !== cat) : [...prev, cat]
+                      );
+                    }} style={[styles.modalChip, { backgroundColor: color, opacity: active ? 0.9 : 0.6 }]}>
+                      <Text style={styles.modalChipText}>{cat}{active ? ' ✔' : ''}</Text>
+                    </TouchableOpacity>
+                  )
+                })}
+              </ScrollView>
+              <View style={styles.modalActions}>
+                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalBtn}>
+                  <Text style={styles.modalBtnText}>Cerrar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.modalBtn}>
+                  <Text style={styles.modalBtnText}>Aceptar</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
 
         {/* Description */}
         <View style={styles.inputGroup}>
@@ -441,5 +496,81 @@ const styles = StyleSheet.create({
     color: colors.surface,
     fontWeight: "700",
     fontSize: 16,
+  },
+  // New styles for multi-select categories
+  multiSelectBtn: {
+    backgroundColor: colors.surfaceAlt,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  multiSelectBtnText: {
+    color: colors.primary,
+    fontWeight: "600",
+  },
+  selectedContainer: {
+    marginTop: 8,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 6,
+  },
+  selectedChip: {
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 999,
+  },
+  selectedChipText: {
+    color: colors.surface,
+    fontWeight: "600",
+  },
+  modalBackdrop: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalContent: {
+    width: '90%',
+    height: '70%',
+    backgroundColor: colors.surface,
+    borderRadius: 12,
+    padding: 12,
+  },
+  modalTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    marginBottom: 8,
+  },
+  modalScroll: {
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  modalChip: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 999,
+    margin: 6,
+  },
+  modalChipText: {
+    color: '#fff',
+    fontWeight: '600',
+  },
+  modalActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingTop: 8,
+  },
+  modalBtn: {
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    marginLeft: 8,
+  },
+  modalBtnText: {
+    color: colors.primary,
+    fontWeight: '700',
   },
 });

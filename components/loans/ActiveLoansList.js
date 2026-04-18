@@ -19,6 +19,7 @@ const statusConfig = {
   solicitado: { label: "Solicitado", icon: "time-outline", color: colors.warning, bg: colors.warning + "15" },
   aprobado: { label: "Aprobado", icon: "checkmark-circle-outline", color: colors.info, bg: colors.info + "15" },
   entrega: { label: "Entregado", icon: "cube-outline", color: colors.success, bg: colors.success + "15" },
+  cancelado: { label: "Cancelado", icon: "close-circle-outline", color: colors.error, bg: colors.error + "15" },
 };
 
 // Helper to format dates
@@ -36,7 +37,7 @@ const formatDate = (date) => {
 // ActiveLoansList: muestra préstamos activos
 const ActiveLoansList = () => {
   const { user } = useAuth();
-  const { userLoans, userLoansLoading, subscribeToUserLoans, markReturned, loading, STATES } = useLoans();
+  const { userLoans, userLoansLoading, subscribeToUserLoans, markReturned, cancelLoan, loading, STATES } = useLoans();
   const { books } = useBooks();
 
   useEffect(() => {
@@ -78,6 +79,28 @@ const ActiveLoansList = () => {
               Alert.alert("Éxito", "El libro ha sido devuelto correctamente.");
             } catch (err) {
               Alert.alert("Error", err.message || "No se pudo devolver el libro.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleCancel = (loanId, bookTitle) => {
+    Alert.alert(
+      "Cancelar Solicitud",
+      `¿Estás seguro de que quieres cancelar esta solicitud?"`,
+      [
+        { text: "No", style: "cancel" },
+        {
+          text: "Sí, cancelar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await cancelLoan(loanId);
+              Alert.alert("Éxito", "La solicitud ha sido cancelada.");
+            } catch (err) {
+              Alert.alert("Error", err.message || "No se pudo cancelar la solicitud.");
             }
           },
         },
@@ -131,6 +154,19 @@ const ActiveLoansList = () => {
                   <ActivityIndicator size="small" color={colors.surface} />
                 ) : (
                   <Ionicons name="arrow-undo" size={14} color={colors.surface} />
+                )}
+              </TouchableOpacity>
+            ) : item.status === STATES.REQUESTED || item.status === STATES.APPROVED ? (
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => handleCancel(item.id, book?.title || "el libro")}
+                disabled={loading}
+                activeOpacity={0.8}
+              >
+                {loading ? (
+                  <ActivityIndicator size="small" color={colors.surface} />
+                ) : (
+                  <Text style={styles.cancelButtonText}>Cancelar</Text>
                 )}
               </TouchableOpacity>
             ) : (
@@ -280,6 +316,19 @@ const styles = StyleSheet.create({
     backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
+  },
+  cancelButton: {
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: colors.error,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  cancelButtonText: {
+    fontSize: 10,
+    fontWeight: "600",
+    color: colors.surface,
   },
   pendingBadge: {
     flexDirection: "row",

@@ -28,7 +28,7 @@ const LoanHistoryList = () => {
     }
   }, [user?.uid, subscribeToUserLoans]);
 
-  const historyLoans = userLoans.filter((loan) => loan.status === STATES.RETURNED);
+  const historyLoans = userLoans.filter((loan) => loan.status === STATES.RETURNED || loan.status === STATES.CANCELLED);
 
   const getBookInfo = (bookId) => books.find((b) => b.id === bookId) || null;
 
@@ -52,8 +52,17 @@ const LoanHistoryList = () => {
         <View style={styles.cardContent}>
           {/* Status Badge */}
           <View style={styles.statusBadge}>
-            <Ionicons name="checkmark-circle" size={10} color={colors.success} />
-            <Text style={styles.statusText}>Devuelto</Text>
+            {item.status === STATES.CANCELLED ? (
+              <>
+                <Ionicons name="close-circle" size={10} color={colors.error} />
+                <Text style={[styles.statusText, { color: colors.error }]}>Cancelado</Text>
+              </>
+            ) : (
+              <>
+                <Ionicons name="checkmark-circle" size={10} color={colors.success} />
+                <Text style={styles.statusText}>Devuelto</Text>
+              </>
+            )}
           </View>
 
           {/* Title & Author */}
